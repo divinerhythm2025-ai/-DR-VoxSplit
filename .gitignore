@@ -1,0 +1,28 @@
+# NOTE: Builds/VisualStudio2026 and JuceLibraryCode ARE committed (not ignored).
+# Headless `Projucer --resave` does not reliably regenerate plugin identity
+# fields (company/manufacturer/plugin codes, bundle ID) in this JUCE 9.0.0
+# build - confirmed by testing: --set-version and --resave both fail/no-op
+# on this project's dual-exporter (XCODE_MAC + VS2026) module path setup.
+# The generated project files here have been hand-verified and patched with
+# the correct DR-VoxSplit identity (see 'DR-VoxSplit.jucer for the intended
+# source of truth). Regenerating via Projucer will require re-applying that
+# patch - see .github/workflows/release.yml for the same fix applied to the
+# macOS build.
+
+# Build output only (not the generated project files themselves)
+Builds/VisualStudio2026/Win32/
+Builds/VisualStudio2026/x64/
+Builds/MacOSX/build/
+
+# Installer build output
+dist/
+installer/windows/payload/
+installer/macos/payload/
+
+# Stray build artifacts
+*.obj
+*.pdb
+*.ilk
+*.exp
+*.lib
+.vs/

@@ -1,0 +1,169 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  # ── Windows: VST3 installer ──────────────────────────────────
+  build-windows:
+    name: Windows installer
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      # Builds/VisualStudio2026 is committed as-is (not regenerated via
+      # Projucer here) - see .gitignore for why: headless Projucer resave
+      # does not reliably propagate this project's plugin identity fields.
+      - name: Locate MSBuild
+        id: msbuild
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe
+          "path=$msbuild" >> $env:GITHUB_OUTPUT
+
+      - name: Build Release VST3
+        shell: pwsh
+        run: |
+          & "${{ steps.msbuild.outputs.path }}" "Builds\VisualStudio2026\'DR-VoxSplit.sln" `
+            /p:Configuration=Release /p:Platform=x64 /m /v:minimal
+
+      - name: Stage installer payload
+        shell: pwsh
+        run: |
+          $stage = "installer\windows\payload\'DR-VoxSplit.vst3"
+          New-Item -ItemType Directory -Force -Path $stage | Out-Null
+          Copy-Item -Path "Builds\VisualStudio2026\x64\Release\VST3\'DR-VoxSplit.vst3\*" -Destination $stage -Recurse -Force
+          $dest = Join-Path $stage "Contents\x86_64-win"
+          Copy-Item -Path "Source\Separation\bin\demucs.exe" -Destination $dest -Force
+          Copy-Item -Path "Source\Separation\bin\demucs-gpu.exe" -Destination $dest -Force
+          Copy-Item -Path "Source\Separation\bin\htdemucs.safetensors" -Destination $dest -Force
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "installer\windows\DR-VoxSplit.iss"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DR-VoxSplit-windows
+          path: dist/DR-VoxSplit-Setup-x64.exe
+
+  # ── macOS: VST3 .pkg installer ───────────────────────────────
+  build-macos:
+    name: macOS installer
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Fetch JUCE (matches the relative module path baked into 'DR-VoxSplit.jucer)
+        run: |
+          git clone --depth 1 --branch 9.0.0 https://github.com/juce-framework/JUCE.git ../JUCE
+
+      - name: Resave project (generates the Xcode project)
+        run: |
+          ../JUCE/extras/Projucer/Builds/MacOSX/build/Release/Projucer.app/Contents/MacOS/Projucer \
+            --resave "'DR-VoxSplit.jucer" || true
+          # Projucer's prebuilt binary path varies by JUCE release layout;
+          # fall back to building Projucer from source if the above binary
+          # isn't present (first-time bring-up - verify and simplify once
+          # this job has actually run once).
+          if [ ! -d "Builds/MacOSX/'DR-VoxSplit.xcodeproj" ]; then
+            xcodebuild -project ../JUCE/extras/Projucer/Builds/MacOSX/Projucer.xcodeproj \
+              -configuration Release -alltargets build
+            ../JUCE/extras/Projucer/Builds/MacOSX/build/Release/Projucer.app/Contents/MacOS/Projucer \
+              --resave "'DR-VoxSplit.jucer"
+          fi
+
+      # KNOWN ISSUE (confirmed on Windows during initial bring-up): headless
+      # `Projucer --resave` does not reliably write this project's plugin
+      # identity fields (company/manufacturer/plugin codes, bundle ID) - it
+      # silently keeps Projucer's own placeholder defaults instead of the
+      # values in 'DR-VoxSplit.jucer's <JUCERPROJECT> tag. Verify whether
+      # this reproduces on macOS; if so, this patch step is required. If
+      # Apple's toolchain resaves correctly here, this step is a no-op find
+      # (grep exits 1) and can be deleted.
+      - name: Patch plugin identity if Projucer reverted to placeholders
+        run: |
+          PBXPROJ=$(find "Builds/MacOSX" -name project.pbxproj)
+          if grep -q "yourcompany" "$PBXPROJ"; then
+            sed -i '' \
+              -e 's/yourcompany/DR/g' \
+              -e 's/com\.DR\.DRVoxSplit/com.dr.drvoxsplit/g' \
+              "$PBXPROJ"
+          fi
+
+      - name: Build demucs CLI (Metal-accelerated on macOS by default)
+        run: |
+          # TODO: replace with the actual clone URL of your demucs-rs-fork
+          # (the local project this was developed against, at
+          # ../demucs-rs-fork - not in this git repo, so CI needs its own
+          # URL to fetch from). Placeholder points at the public upstream,
+          # which will NOT include your fork's local changes.
+          git clone --depth 1 https://github.com/nikhilunni/demucs-rs ../demucs-rs-fork
+          cd ../demucs-rs-fork
+          rustup target add aarch64-apple-darwin
+          cargo build -p demucs-cli --release --target aarch64-apple-darwin
+
+      - name: Build Release VST3
+        run: |
+          xcodebuild -project "Builds/MacOSX/'DR-VoxSplit.xcodeproj" \
+            -configuration Release -alltargets build
+
+      - name: Stage installer payload
+        run: |
+          STAGE="installer/macos/payload/'DR-VoxSplit.vst3"
+          mkdir -p "$STAGE"
+          cp -R "Builds/MacOSX/build/Release/'DR-VoxSplit.vst3/." "$STAGE/"
+          DEST="$STAGE/Contents/MacOS"
+          cp ../demucs-rs-fork/target/aarch64-apple-darwin/release/demucs "$DEST/demucs"
+          cp "Source/Separation/bin/htdemucs.safetensors" "$DEST/htdemucs.safetensors"
+
+      # TODO: sign + notarize once an Apple Developer ID certificate is
+      # available (mirrors demucs-rs-fork/.github/workflows/release.yml,
+      # which already does this for that project's own macOS plugin) -
+      # needs secrets.DEVELOPER_ID_CERT_P12 / _PASSWORD, APPLE_ID,
+      # APPLE_ID_PASSWORD, APPLE_TEAM_ID. Until then this .pkg is unsigned;
+      # see INSTALL.md for the Gatekeeper bypass end users will need.
+
+      - name: Build .pkg installer
+        run: |
+          mkdir -p dist
+          pkgbuild --root "installer/macos/payload" \
+            --identifier com.dr.drvoxsplit \
+            --version 1.0.0 \
+            --install-location "/Library/Audio/Plug-Ins/VST3" \
+            dist/DR-VoxSplit-Installer-macos.pkg
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DR-VoxSplit-macos
+          path: dist/DR-VoxSplit-Installer-macos.pkg
+
+  # ── GitHub Release ────────────────────────────────────────────
+  create-release:
+    name: Create Release
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: artifacts/*

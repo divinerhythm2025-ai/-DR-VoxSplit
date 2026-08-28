@@ -1,0 +1,41 @@
+DR-VoxSplit End-User License Agreement
+
+Copyright (c) 2026 DR. All rights reserved.
+
+This software ("DR-VoxSplit") is licensed, not sold, to you for use subject
+to the terms below.
+
+1. GRANT OF LICENSE
+   You are granted a non-exclusive, non-transferable license to install and
+   use DR-VoxSplit on computers you own or control, for music production
+   purposes.
+
+2. RESTRICTIONS
+   You may not redistribute, resell, sublicense, reverse engineer, or
+   decompile this software, except to the extent such restriction is
+   prohibited by applicable law.
+
+3. THIRD-PARTY COMPONENTS
+   DR-VoxSplit bundles a native inference engine and pretrained model
+   weights derived from the open-source HTDemucs v4 model (Meta Research,
+   Apache License 2.0) via the demucs-rs project. See that project's
+   LICENSE for full attribution terms.
+
+4. WARRANTY DISCLAIMER
+   THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+   OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+   NONINFRINGEMENT.
+
+5. LIMITATION OF LIABILITY
+   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+   CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM, OUT OF, OR IN
+   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+
+By clicking "I Accept" during installation, you agree to the terms above.
+
+---
+NOTE TO DR: this is a placeholder EULA sufficient to ship an installer.
+Have it reviewed by counsel before a real commercial launch, and replace
+the copyright holder / contact details with your actual legal entity.

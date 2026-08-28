@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="EpXRyZ" name="'DR-VoxSplit" projectType="audioplug" useAppConfig="0"
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1"
+              version="1.0.0" companyName="DR" companyWebsite="https://example.com"
+              companyEmail="support@example.com" bundleIdentifier="com.dr.drvoxsplit"
+              pluginManufacturer="DR" pluginManufacturerCode="Dree" pluginCode="Vxsp"
+              pluginDesc="Drag-and-drop vocal/instrumental stem separation"
+              pluginFormats="buildVST3,buildStandalone" pluginCharacteristicsValue="pluginIsUtility"
+              pluginVST3Category="Fx,Tools">
+  <MAINGROUP id="Tq2Oqi" name="'DR-VoxSplit">
+    <GROUP id="{8AE70361-C512-B726-27F3-E72E74AC83AF}" name="Source">
+      <FILE id="oqSh26" name="PluginProcessor.cpp" compile="1" resource="0"
+            file="Source/PluginProcessor.cpp"/>
+      <FILE id="FHca5o" name="PluginProcessor.h" compile="0" resource="0"
+            file="Source/PluginProcessor.h"/>
+      <FILE id="XRGG8w" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
+      <FILE id="TIgc4r" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <GROUP id="{9C1E1A2B-4F3D-4A2E-8B7A-1234567890AB}" name="Separation">
+        <FILE id="dvsSE1" name="SeparationEngine.h" compile="0" resource="0"
+              file="Source/Separation/SeparationEngine.h"/>
+        <FILE id="dvsSE2" name="SeparationEngine.cpp" compile="1" resource="0"
+              file="Source/Separation/SeparationEngine.cpp"/>
+        <FILE id="dvsPC1" name="NonBlockingChildProcess.h" compile="0" resource="0"
+              file="Source/Separation/NonBlockingChildProcess.h"/>
+        <FILE id="dvsPC2" name="NonBlockingChildProcess.cpp" compile="1" resource="0"
+              file="Source/Separation/NonBlockingChildProcess.cpp"/>
+        <FILE id="dvsPP1" name="PreviewPlayer.h" compile="0" resource="0"
+              file="Source/Separation/PreviewPlayer.h"/>
+        <FILE id="dvsSP1" name="StemPreviewPanel.h" compile="0" resource="0"
+              file="Source/Separation/StemPreviewPanel.h"/>
+        <FILE id="dvsSP2" name="StemPreviewPanel.cpp" compile="1" resource="0"
+              file="Source/Separation/StemPreviewPanel.cpp"/>
+      </GROUP>
+    </GROUP>
+  </MAINGROUP>
+  <MODULES>
+    <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_devices" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_formats" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_plugin_client" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="0"/>
+    <MODULE id="juce_audio_processors" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_audio_processors_headless" showAllCode="1" useLocalCopy="0"
+            useGlobalPath="0"/>
+    <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+  </MODULES>
+  <JUCEOPTIONS JUCE_STRICT_REFCOUNTEDPOINTER="1" JUCE_VST3_CAN_REPLACE_VST2="0"
+               JUCE_USE_FLAC="1" JUCE_USE_MP3AUDIOFORMAT="1" JUCE_USE_WINDOWS_MEDIA_FORMAT="1"/>
+  <EXPORTFORMATS>
+    <XCODE_MAC targetFolder="Builds/MacOSX">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="'DR-VoxSplit"
+                       osxArchitecture="64BitUniversal"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="'DR-VoxSplit"
+                       osxArchitecture="64BitUniversal"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors_headless" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+    <VS2026 targetFolder="Builds/VisualStudio2026">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" targetName="'DR-VoxSplit"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="'DR-VoxSplit"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors_headless" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../JUCE/modules"/>
+      </MODULEPATHS>
+    </VS2026>
+  </EXPORTFORMATS>
+</JUCERPROJECT>

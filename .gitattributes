@@ -1,0 +1,2 @@
+Source/Separation/bin/*.safetensors filter=lfs diff=lfs merge=lfs -text
+Source/Separation/bin/*.exe filter=lfs diff=lfs merge=lfs -text

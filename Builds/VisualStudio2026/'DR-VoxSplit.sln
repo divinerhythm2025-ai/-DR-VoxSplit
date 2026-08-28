@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio Version 18
+
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "'DR-VoxSplit - Standalone Plugin", "'DR-VoxSplit_StandalonePlugin.vcxproj", "{F202DF4B-EC41-E2BB-C166-E7FB13538D18}"
+	ProjectSection(ProjectDependencies) = postProject
+		{10CC1A09-A908-5D7B-4EB3-6F99988F349C} = {10CC1A09-A908-5D7B-4EB3-6F99988F349C}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "'DR-VoxSplit - VST3", "'DR-VoxSplit_VST3.vcxproj", "{F34B55B6-BEAB-76C2-0C4A-6817A174573A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{10CC1A09-A908-5D7B-4EB3-6F99988F349C} = {10CC1A09-A908-5D7B-4EB3-6F99988F349C}
+		{ECD1E053-B620-42BC-FC92-805EF6877077} = {ECD1E053-B620-42BC-FC92-805EF6877077}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "'DR-VoxSplit - Shared Code", "'DR-VoxSplit_SharedCode.vcxproj", "{10CC1A09-A908-5D7B-4EB3-6F99988F349C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "'DR-VoxSplit - VST3 Manifest Helper", "'DR-VoxSplit_VST3ManifestHelper.vcxproj", "{ECD1E053-B620-42BC-FC92-805EF6877077}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F34B55B6-BEAB-76C2-0C4A-6817A174573A}.Debug|x64.ActiveCfg = Debug|x64
+		{F34B55B6-BEAB-76C2-0C4A-6817A174573A}.Debug|x64.Build.0 = Debug|x64
+		{F34B55B6-BEAB-76C2-0C4A-6817A174573A}.Release|x64.ActiveCfg = Release|x64
+		{F34B55B6-BEAB-76C2-0C4A-6817A174573A}.Release|x64.Build.0 = Release|x64
+		{F202DF4B-EC41-E2BB-C166-E7FB13538D18}.Debug|x64.ActiveCfg = Debug|x64
+		{F202DF4B-EC41-E2BB-C166-E7FB13538D18}.Debug|x64.Build.0 = Debug|x64
+		{F202DF4B-EC41-E2BB-C166-E7FB13538D18}.Release|x64.ActiveCfg = Release|x64
+		{F202DF4B-EC41-E2BB-C166-E7FB13538D18}.Release|x64.Build.0 = Release|x64
+		{10CC1A09-A908-5D7B-4EB3-6F99988F349C}.Debug|x64.ActiveCfg = Debug|x64
+		{10CC1A09-A908-5D7B-4EB3-6F99988F349C}.Debug|x64.Build.0 = Debug|x64
+		{10CC1A09-A908-5D7B-4EB3-6F99988F349C}.Release|x64.ActiveCfg = Release|x64
+		{10CC1A09-A908-5D7B-4EB3-6F99988F349C}.Release|x64.Build.0 = Release|x64
+		{ECD1E053-B620-42BC-FC92-805EF6877077}.Debug|x64.ActiveCfg = Debug|Win32
+		{ECD1E053-B620-42BC-FC92-805EF6877077}.Debug|x64.Build.0 = Debug|Win32
+		{ECD1E053-B620-42BC-FC92-805EF6877077}.Release|x64.ActiveCfg = Release|Win32
+		{ECD1E053-B620-42BC-FC92-805EF6877077}.Release|x64.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
