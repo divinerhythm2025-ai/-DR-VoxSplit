@@ -105,13 +105,10 @@ jobs:
           fi
 
       - name: Build demucs CLI (Metal-accelerated on macOS by default)
+        env:
+          FORK_PAT: ${{ secrets.DEMUCS_FORK_PAT }}
         run: |
-          # TODO: replace with the actual clone URL of your demucs-rs-fork
-          # (the local project this was developed against, at
-          # ../demucs-rs-fork - not in this git repo, so CI needs its own
-          # URL to fetch from). Placeholder points at the public upstream,
-          # which will NOT include your fork's local changes.
-          git clone --depth 1 https://github.com/nikhilunni/demucs-rs ../demucs-rs-fork
+          git clone --depth 1 "https://x-access-token:${FORK_PAT}@github.com/divinerhythm2025-ai/demucs-rs-fork.git" ../demucs-rs-fork
           cd ../demucs-rs-fork
           rustup target add aarch64-apple-darwin
           cargo build -p demucs-cli --release --target aarch64-apple-darwin
