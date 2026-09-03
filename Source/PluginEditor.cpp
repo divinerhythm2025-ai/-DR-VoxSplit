@@ -49,6 +49,11 @@ DRVoxSplitAudioProcessorEditor::DRVoxSplitAudioProcessorEditor (DRVoxSplitAudioP
     headerSubtitleLabel.setColour (juce::Label::textColourId, juce::Colour (0xff858a94));
     addAndMakeVisible (headerSubtitleLabel);
 
+    licenseStatusButton.setColour (juce::TextButton::buttonColourId, juce::Colour (0xff11151e));
+    licenseStatusButton.setColour (juce::TextButton::textColourOffId, juce::Colour (0xffc5c9d4));
+    licenseStatusButton.onClick = [this] { LicenseActivationDialog::show (this, audioProcessor.getLicenseManager()); };
+    addAndMakeVisible (licenseStatusButton);
+
     //==========================================================
     // Input panel
     //==========================================================
@@ -207,6 +212,10 @@ DRVoxSplitAudioProcessorEditor::DRVoxSplitAudioProcessorEditor (DRVoxSplitAudioP
     audioProcessor.setActiveUiListener (this);
     syncFromProcessorState();
 
+    audioProcessor.getLicenseManager().addListener (this);
+    updateLicenseStatusUi();
+    audioProcessor.getLicenseManager().revalidateInBackground();
+
     setResizable (true, true);
     setResizeLimits (900, 700, 1700, 1150);
     setSize (1500, 920);
@@ -214,8 +223,18 @@ DRVoxSplitAudioProcessorEditor::DRVoxSplitAudioProcessorEditor (DRVoxSplitAudioP
 
 DRVoxSplitAudioProcessorEditor::~DRVoxSplitAudioProcessorEditor()
 {
+    audioProcessor.getLicenseManager().removeListener (this);
     inputThumbnail.removeChangeListener (this);
     audioProcessor.setActiveUiListener (nullptr);
+}
+
+//==============================================================================
+void DRVoxSplitAudioProcessorEditor::updateLicenseStatusUi()
+{
+    const bool licensed = audioProcessor.getLicenseManager().isCurrentlyLicensed();
+    licenseStatusButton.setButtonText (licensed ? "Licensed" : "Not Activated");
+    licenseStatusButton.setColour (juce::TextButton::textColourOffId,
+                                    licensed ? juce::Colour (0xff7fd88f) : juce::Colour (0xffc5c9d4));
 }
 
 //==============================================================================
@@ -316,6 +335,12 @@ void DRVoxSplitAudioProcessorEditor::loadSelectedFile (const juce::File& file)
 
 void DRVoxSplitAudioProcessorEditor::startButtonClicked()
 {
+    if (! audioProcessor.getLicenseManager().isCurrentlyLicensed())
+    {
+        LicenseActivationDialog::show (this, audioProcessor.getLicenseManager());
+        return;
+    }
+
     if (! audioProcessor.getSeparationEngine().isAvailable())
     {
         juce::NativeMessageBox::showMessageBoxAsync (juce::MessageBoxIconType::WarningIcon,
@@ -627,6 +652,7 @@ void DRVoxSplitAudioProcessorEditor::resized()
     auto header = full.removeFromTop (62).reduced (18, 0);
     headerLogoLabel.setBounds (header.getX(), 14, 300, 28);
     headerSubtitleLabel.setBounds (header.getX(), 42, 220, 16);
+    licenseStatusButton.setBounds (header.getRight() - 170, 18, 170, 26);
 
     full.removeFromBottom (34); // footer, painted only
 

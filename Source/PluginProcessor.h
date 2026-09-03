@@ -17,6 +17,7 @@
 
 #include <JuceHeader.h>
 #include "Separation/SeparationEngine.h"
+#include "Licensing/LicenseManager.h"
 
 //==============================================================================
 class DRVoxSplitAudioProcessor  : public juce::AudioProcessor,
@@ -63,6 +64,11 @@ public:
     //==============================================================================
     SeparationEngine& getSeparationEngine() noexcept { return separationEngine; }
 
+    /** Per-machine activation state - see Source/Licensing/LicenseManager.h.
+        Owned here (not the editor) so it survives editor close/reopen, same
+        reasoning as separationEngine above. */
+    LicenseManager& getLicenseManager() noexcept { return licenseManager; }
+
     /** Snapshot of separation state, persisted here (not in the editor) so
         results/progress survive the editor being closed and reopened. */
     struct UiState
@@ -89,6 +95,7 @@ private:
     void separationFailed (const juce::String& errorMessage) override;
 
     SeparationEngine separationEngine;
+    LicenseManager licenseManager;
     UiState uiState;
     SeparationEngine::Listener* activeUiListener = nullptr;
 

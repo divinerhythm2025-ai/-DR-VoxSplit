@@ -33,6 +33,22 @@
         <FILE id="dvsSP2" name="StemPreviewPanel.cpp" compile="1" resource="0"
               file="Source/Separation/StemPreviewPanel.cpp"/>
       </GROUP>
+      <GROUP id="{2B7C4E1A-9D3F-4A6E-8C2B-ABCDEF012345}" name="Licensing">
+        <FILE id="dvsLC1" name="LicenseCrypto.h" compile="0" resource="0"
+              file="Source/Licensing/LicenseCrypto.h"/>
+        <FILE id="dvsLC2" name="LicenseCrypto.cpp" compile="1" resource="0"
+              file="Source/Licensing/LicenseCrypto.cpp"/>
+        <FILE id="dvsLK1" name="LicensePublicKey.h" compile="0" resource="0"
+              file="Source/Licensing/LicensePublicKey.h"/>
+        <FILE id="dvsLM1" name="LicenseManager.h" compile="0" resource="0"
+              file="Source/Licensing/LicenseManager.h"/>
+        <FILE id="dvsLM2" name="LicenseManager.cpp" compile="1" resource="0"
+              file="Source/Licensing/LicenseManager.cpp"/>
+        <FILE id="dvsLD1" name="LicenseActivationDialog.h" compile="0" resource="0"
+              file="Source/Licensing/LicenseActivationDialog.h"/>
+        <FILE id="dvsLD2" name="LicenseActivationDialog.cpp" compile="1" resource="0"
+              file="Source/Licensing/LicenseActivationDialog.cpp"/>
+      </GROUP>
     </GROUP>
   </MAINGROUP>
   <MODULES>
@@ -46,6 +62,7 @@
             useGlobalPath="0"/>
     <MODULE id="juce_audio_utils" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_cryptography" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
@@ -64,6 +81,7 @@
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>
@@ -85,6 +103,7 @@
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_events" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_data_structures" path="../../../JUCE/modules"/>
         <MODULEPATH id="juce_graphics" path="../../../JUCE/modules"/>

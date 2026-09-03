@@ -13,12 +13,14 @@
 #include "Separation/StemPreviewPanel.h"
 #include "Separation/PreviewPlayer.h"
 #include "Separation/StemExporter.h"
+#include "Licensing/LicenseActivationDialog.h"
 
 //==============================================================================
 class DRVoxSplitAudioProcessorEditor  : public juce::AudioProcessorEditor,
                                          public juce::FileDragAndDropTarget,
                                          private juce::ChangeListener,
-                                         private SeparationEngine::Listener
+                                         private SeparationEngine::Listener,
+                                         private LicenseManager::Listener
 {
 public:
     explicit DRVoxSplitAudioProcessorEditor (DRVoxSplitAudioProcessor&);
@@ -46,6 +48,13 @@ private:
 
     void changeListenerCallback (juce::ChangeBroadcaster*) override { repaint(); }
 
+    // LicenseManager::Listener - fires when activate()/deactivate()/
+    // revalidateInBackground() actually change licensing state; independent
+    // of whether a LicenseActivationDialog is currently open (see
+    // LicenseActivationDialog.h for why the dialog itself doesn't report
+    // back through a callback instead).
+    void licenseStateChanged() override { updateLicenseStatusUi(); }
+
     //==============================================================================
     // Loading a file (browse or drop) only validates it and shows its info/waveform
     // - it does NOT start separation. That's startButtonClicked()'s job, matching
@@ -56,6 +65,7 @@ private:
     void browseButtonClicked();
     void syncFromProcessorState();
     void setIdleUi();
+    void updateLicenseStatusUi();
     void loadInputFileInfo (const juce::File& file, double durationSeconds);
 
     void setQualityChoice (SeparationEngine::Quality q);
@@ -81,6 +91,7 @@ private:
     // Header
     juce::Label headerLogoLabel;
     juce::Label headerSubtitleLabel;
+    juce::TextButton licenseStatusButton; // shows "Not Activated" / "Licensed" - click opens LicenseActivationDialog
 
     //==============================================================================
     // Input panel
