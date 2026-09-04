@@ -79,9 +79,22 @@ jobs:
         with:
           lfs: true
 
+      # The .jucer's XCODE_MAC exporter declares module paths as
+      # "../../../JUCE/modules" relative to its targetFolder
+      # (Builds/MacOSX) - i.e. JUCE must sit three directories above
+      # Builds/MacOSX, which is two above the repo root. actions/checkout
+      # puts the repo at .../work/<repo>/<repo>, so JUCE has to go to
+      # .../work/JUCE (two up from repo root), not one (confirmed via CI:
+      # one-up produced "Error when saving: At least one of your JUCE
+      # module paths is invalid!" - locally this is masked because
+      # Projucer silently falls back to a JUCE path cached in the
+      # developer's own app preferences when the declared relative path
+      # doesn't resolve, which is also why the committed Windows .vcxproj
+      # files ended up with an absolute Downloads path baked in instead of
+      # a working relative one).
       - name: Fetch JUCE (matches the relative module path baked into 'DR-VoxSplit.jucer)
         run: |
-          git clone --depth 1 --branch 9.0.0 https://github.com/juce-framework/JUCE.git ../JUCE
+          git clone --depth 1 --branch 9.0.0 https://github.com/juce-framework/JUCE.git ../../JUCE
 
       - name: Resave project (generates the Xcode project)
         run: |
@@ -97,7 +110,7 @@ jobs:
           # filename, so this doesn't change anything about the output.
           cp "'DR-VoxSplit.jucer" resave-copy.jucer
 
-          ../JUCE/extras/Projucer/Builds/MacOSX/build/Release/Projucer.app/Contents/MacOS/Projucer \
+          ../../JUCE/extras/Projucer/Builds/MacOSX/build/Release/Projucer.app/Contents/MacOS/Projucer \
             --resave resave-copy.jucer
           # Projucer's prebuilt binary path varies by JUCE release layout;
           # fall back to building Projucer from source if the above binary
@@ -105,19 +118,19 @@ jobs:
           # this job has actually run once).
           if [ ! -d "Builds/MacOSX/'DR-VoxSplit.xcodeproj" ]; then
             set -e
-            xcodebuild -project ../JUCE/extras/Projucer/Builds/MacOSX/Projucer.xcodeproj \
+            xcodebuild -project ../../JUCE/extras/Projucer/Builds/MacOSX/Projucer.xcodeproj \
               -configuration Release -alltargets build
             set +e
-            PROJUCER="../JUCE/extras/Projucer/Builds/MacOSX/build/Release/Projucer.app/Contents/MacOS/Projucer"
+            PROJUCER="../../JUCE/extras/Projucer/Builds/MacOSX/build/Release/Projucer.app/Contents/MacOS/Projucer"
             # Freshly built + ad-hoc-signed - clear any quarantine attr before
             # launching it, in case that's what silently kills the resave below.
-            xattr -cr "../JUCE/extras/Projucer/Builds/MacOSX/build/Release/Projucer.app" || true
+            xattr -cr "../../JUCE/extras/Projucer/Builds/MacOSX/build/Release/Projucer.app" || true
             "$PROJUCER" --resave resave-copy.jucer
             status=$?
             echo "Projucer --resave exit code: $status"
             if [ $status -ne 0 ]; then
               echo "::error::Projucer --resave failed (exit $status) - checking for a crash report"
-              find ~/Library/Logs/DiagnosticReports -newer ../JUCE -iname "*Projucer*" -exec cat {} \; 2>/dev/null || true
+              find ~/Library/Logs/DiagnosticReports -newer ../../JUCE -iname "*Projucer*" -exec cat {} \; 2>/dev/null || true
               exit $status
             fi
           fi
