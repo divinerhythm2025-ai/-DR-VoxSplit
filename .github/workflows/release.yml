@@ -86,8 +86,19 @@ jobs:
       - name: Resave project (generates the Xcode project)
         run: |
           set +e
+          # Projucer's own CLI arg parser strips a leading quote-like
+          # character off its --resave argument (confirmed via CI: it
+          # logged "Could not find file: .../DR-VoxSplit.jucer", silently
+          # dropping the leading apostrophe that's actually part of this
+          # project's real filename). Resave a same-directory copy without
+          # that leading character instead - the generated Xcode project's
+          # name/location come from the <JUCERPROJECT name="'DR-VoxSplit">
+          # attribute and the exporter's targetFolder, not the .jucer's own
+          # filename, so this doesn't change anything about the output.
+          cp "'DR-VoxSplit.jucer" resave-copy.jucer
+
           ../JUCE/extras/Projucer/Builds/MacOSX/build/Release/Projucer.app/Contents/MacOS/Projucer \
-            --resave "'DR-VoxSplit.jucer"
+            --resave resave-copy.jucer
           # Projucer's prebuilt binary path varies by JUCE release layout;
           # fall back to building Projucer from source if the above binary
           # isn't present (first-time bring-up - verify and simplify once
@@ -101,7 +112,7 @@ jobs:
             # Freshly built + ad-hoc-signed - clear any quarantine attr before
             # launching it, in case that's what silently kills the resave below.
             xattr -cr "../JUCE/extras/Projucer/Builds/MacOSX/build/Release/Projucer.app" || true
-            "$PROJUCER" --resave "'DR-VoxSplit.jucer"
+            "$PROJUCER" --resave resave-copy.jucer
             status=$?
             echo "Projucer --resave exit code: $status"
             if [ $status -ne 0 ]; then
@@ -110,6 +121,7 @@ jobs:
               exit $status
             fi
           fi
+          rm -f resave-copy.jucer
           if [ ! -d "Builds/MacOSX/'DR-VoxSplit.xcodeproj" ]; then
             echo "::error::Builds/MacOSX/'DR-VoxSplit.xcodeproj still missing after resave"
             exit 1
