@@ -35,13 +35,17 @@
 
 #include <juce_core/juce_core.h>
 
-#ifndef NOMINMAX
- #define NOMINMAX
+#if JUCE_WINDOWS
+ #ifndef NOMINMAX
+  #define NOMINMAX
+ #endif
+ #ifndef WIN32_LEAN_AND_MEAN
+  #define WIN32_LEAN_AND_MEAN
+ #endif
+ #include <windows.h>
+#else
+ #include <sys/types.h> // pid_t
 #endif
-#ifndef WIN32_LEAN_AND_MEAN
- #define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
 
 class NonBlockingChildProcess
 {
@@ -89,10 +93,17 @@ public:
 private:
     void closeAll();
 
+   #if JUCE_WINDOWS
     HANDLE hChildStdOutWrite = nullptr; // child's end - closed once the child owns it
     HANDLE hReadPipe = nullptr;         // parent reads the child's merged stdout/stderr here
     HANDLE hProcess = nullptr;
     HANDLE hThread = nullptr;
+   #else
+    int readFd = -1;             // parent reads the child's merged stdout/stderr here, O_NONBLOCK
+    pid_t childPid = -1;
+    mutable bool reaped = false; // whether childPid has already been consumed by a waitpid() call
+    mutable uint32_t cachedExitCode = 0;
+   #endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NonBlockingChildProcess)
 };
