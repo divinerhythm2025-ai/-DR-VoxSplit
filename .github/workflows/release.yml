@@ -162,6 +162,17 @@ jobs:
               "$PBXPROJ"
           fi
 
+      # CI failure: "error: The i386 architecture is deprecated. You should
+      # update your ARCHS build setting to remove the i386 architecture."
+      # The .jucer's osxArchitecture="64BitUniversal" makes Projucer 9.0.0
+      # emit an ARCHS setting Xcode 26.6's toolchain hard-errors on (fails
+      # during CreateBuildDescription, before any target actually compiles).
+      # Force it to just arm64 + x86_64 directly in the generated project.
+      - name: Patch ARCHS to drop the deprecated i386 architecture
+        run: |
+          PBXPROJ=$(find "Builds/MacOSX" -name project.pbxproj)
+          sed -i '' -E 's/ARCHS = [^;]+;/ARCHS = "x86_64 arm64";/g' "$PBXPROJ"
+
       - name: Build demucs CLI (Metal-accelerated on macOS by default)
         env:
           FORK_PAT: ${{ secrets.DEMUCS_FORK_PAT }}
