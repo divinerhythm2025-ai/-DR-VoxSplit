@@ -28,6 +28,18 @@ jobs:
           $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find MSBuild\**\Bin\MSBuild.exe
           "path=$msbuild" >> $env:GITHUB_OUTPUT
 
+      # The committed .vcxproj files have JUCE's module path hardcoded as an
+      # absolute path (baked in from the dev machine when Projucer last
+      # generated them - see the "committed as-is" note above), not a
+      # relative one, so JUCE has to actually exist at that literal path
+      # here too rather than wherever actions/checkout or a relative clone
+      # would put it.
+      - name: Fetch JUCE to the hardcoded absolute module path
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path "C:\Users\manis\Downloads\juce-9.0.0-windows" | Out-Null
+          git clone --depth 1 --branch 9.0.0 https://github.com/juce-framework/JUCE.git "C:\Users\manis\Downloads\juce-9.0.0-windows\JUCE"
+
       - name: Build Release VST3
         shell: pwsh
         run: |
@@ -73,17 +85,34 @@ jobs:
 
       - name: Resave project (generates the Xcode project)
         run: |
+          set +e
           ../JUCE/extras/Projucer/Builds/MacOSX/build/Release/Projucer.app/Contents/MacOS/Projucer \
-            --resave "'DR-VoxSplit.jucer" || true
+            --resave "'DR-VoxSplit.jucer"
           # Projucer's prebuilt binary path varies by JUCE release layout;
           # fall back to building Projucer from source if the above binary
           # isn't present (first-time bring-up - verify and simplify once
           # this job has actually run once).
           if [ ! -d "Builds/MacOSX/'DR-VoxSplit.xcodeproj" ]; then
+            set -e
             xcodebuild -project ../JUCE/extras/Projucer/Builds/MacOSX/Projucer.xcodeproj \
               -configuration Release -alltargets build
-            ../JUCE/extras/Projucer/Builds/MacOSX/build/Release/Projucer.app/Contents/MacOS/Projucer \
-              --resave "'DR-VoxSplit.jucer"
+            set +e
+            PROJUCER="../JUCE/extras/Projucer/Builds/MacOSX/build/Release/Projucer.app/Contents/MacOS/Projucer"
+            # Freshly built + ad-hoc-signed - clear any quarantine attr before
+            # launching it, in case that's what silently kills the resave below.
+            xattr -cr "../JUCE/extras/Projucer/Builds/MacOSX/build/Release/Projucer.app" || true
+            "$PROJUCER" --resave "'DR-VoxSplit.jucer"
+            status=$?
+            echo "Projucer --resave exit code: $status"
+            if [ $status -ne 0 ]; then
+              echo "::error::Projucer --resave failed (exit $status) - checking for a crash report"
+              find ~/Library/Logs/DiagnosticReports -newer ../JUCE -iname "*Projucer*" -exec cat {} \; 2>/dev/null || true
+              exit $status
+            fi
+          fi
+          if [ ! -d "Builds/MacOSX/'DR-VoxSplit.xcodeproj" ]; then
+            echo "::error::Builds/MacOSX/'DR-VoxSplit.xcodeproj still missing after resave"
+            exit 1
           fi
 
       # KNOWN ISSUE (confirmed on Windows during initial bring-up): headless
