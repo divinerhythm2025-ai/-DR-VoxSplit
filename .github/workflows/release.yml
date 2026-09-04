@@ -148,6 +148,24 @@ jobs:
           name: DR-VoxSplit-macos
           path: dist/DR-VoxSplit-Installer-macos.pkg
 
+      # Standalone app - lets a tester just double-click and run, no DAW
+      # needed. SeparationEngine locates demucs/the model next to
+      # currentExecutableFile, which for an .app is Contents/MacOS - same
+      # layout as the VST3 payload above, so the same two files are copied.
+      - name: Stage Standalone app payload
+        run: |
+          APP="Builds/MacOSX/build/Release/'DR-VoxSplit.app"
+          DEST="$APP/Contents/MacOS"
+          cp ../demucs-rs-fork/target/aarch64-apple-darwin/release/demucs "$DEST/demucs"
+          cp "Source/Separation/bin/htdemucs.safetensors" "$DEST/htdemucs.safetensors"
+          mkdir -p dist
+          ditto -c -k --sequesterRsrc --keepParent "$APP" "dist/DR-VoxSplit-Standalone-macos.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: DR-VoxSplit-macos-standalone
+          path: dist/DR-VoxSplit-Standalone-macos.zip
+
   # ── GitHub Release ────────────────────────────────────────────
   create-release:
     name: Create Release
