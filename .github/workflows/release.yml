@@ -57,6 +57,18 @@ jobs:
           Copy-Item -Path "Source\Separation\bin\demucs-gpu.exe" -Destination $dest -Force
           Copy-Item -Path "Source\Separation\bin\htdemucs.safetensors" -Destination $dest -Force
 
+          # Standalone - lets a tester just launch the app directly, no DAW
+          # needed. SeparationEngine locates demucs/the model next to
+          # currentExecutableFile, which for the Standalone build is simply
+          # the folder the .exe itself sits in (no Contents\x86_64-win
+          # nesting like the VST3 bundle above).
+          $standaloneStage = "installer\windows\payload\standalone"
+          New-Item -ItemType Directory -Force -Path $standaloneStage | Out-Null
+          Copy-Item -Path "Builds\VisualStudio2026\x64\Release\Standalone Plugin\'DR-VoxSplit.exe" -Destination $standaloneStage -Force
+          Copy-Item -Path "Source\Separation\bin\demucs.exe" -Destination $standaloneStage -Force
+          Copy-Item -Path "Source\Separation\bin\demucs-gpu.exe" -Destination $standaloneStage -Force
+          Copy-Item -Path "Source\Separation\bin\htdemucs.safetensors" -Destination $standaloneStage -Force
+
       - name: Install Inno Setup
         run: choco install innosetup --no-progress -y
 
